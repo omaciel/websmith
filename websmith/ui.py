@@ -1,5 +1,5 @@
 """Foobar."""
-from websmith.action import Action
+from websmith.actions import Action
 
 
 class Session(object):

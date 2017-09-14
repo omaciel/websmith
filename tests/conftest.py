@@ -1,5 +1,3 @@
-import os
-
 import pytest
 
 from selenium import webdriver
@@ -16,4 +14,3 @@ def browser(request):
     request.addfinalizer(close_browser)
 
     return browser
-
