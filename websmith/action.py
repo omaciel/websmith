@@ -14,6 +14,17 @@ class Action(object):
         raise NotImplementedError()
 
 
+class Click(Action):
+
+    def __init__(self, target):
+        self.target = target
+
+        super(Click, self).__init__()
+
+    def _run(self):
+        wait_until_element_exists(self.browser, self.target).click()
+
+
 class Hover(Action):
 
     def __init__(self, target):
