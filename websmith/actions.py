@@ -1,13 +1,21 @@
 """Implements VERB-like objects that allow interction with DOM elements."""
+import logging
 import threading
 
 from websmith.utils import perform_action_chain_move, wait_until_element_exists
+
+logging.basicConfig(level=logging.INFO)
+LOGGER = logging.getLogger(__name__)
 
 
 class Action(object):
     data = threading.local()
 
     def __init__(self):
+        LOGGER.info('ACTION: {} on {}'.format(
+            self.__class__.__name__,
+            self.__dict__
+        ))
         self._run()
 
     def _run(self):
