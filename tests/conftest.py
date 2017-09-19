@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from selenium import webdriver
@@ -14,3 +16,10 @@ def browser(request):
     request.addfinalizer(close_browser)
 
     return browser
+
+
+@pytest.fixture(scope='session')
+def page(request):
+    '''Fixture to provide a testable web page.'''
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    return '{}{}{}'.format('file://', dir_path, '/data/page.html')
