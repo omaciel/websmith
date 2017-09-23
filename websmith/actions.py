@@ -2,18 +2,6 @@
 import logging
 import threading
 
-from websmith.utils import (
-    choose,
-    fill_form,
-    find_element,
-    find_elements,
-    perform_action_chain_move,
-    select,
-    wait_until_element_exists,
-)
-
-from selenium.webdriver.common.by import By
-
 
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
@@ -35,210 +23,159 @@ class Action(object):
         raise NotImplementedError()
 
 
-class Check(Action):
+def Check(name):
     '''Mark a checkbox as checked.
 
-    Borrowed from https://github.com/cobrateam/splinter
-
     Example:
-        >>> Check('some-check-box')
+
+    >>> Check('some-check-box')
     '''
+    browser = Action.browser
 
-    def __init__(self, name):
-        self.name = name
-
-        super(Check, self).__init__()
-
-    def _run(self):
-        locator = (By.NAME, self.name)
-        element = wait_until_element_exists(self.browser, locator)
-        element.check()
+    return browser.check(name)
 
 
-class Choose(Action):
+def Choose(name, value):
     '''Mark a radiobox as checked.
 
     Borrowed from https://github.com/cobrateam/splinter
 
     Example:
-        >>> Choose('some-radiobox-name', 'some-radiobutton-value')
+
+    >>> Choose('some-radiobox-name', 'some-radiobutton-value')
     '''
+    browser = Action.browser
 
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
-        super(Choose, self).__init__()
-
-    def _run(self):
-        choose(self.browser, self.name, self.value)
+    browser.choose(name, value)
 
 
-class Click(Action):
-    '''Click a web element.
+def Click(element):
+    '''Executes a 'click' on a web element.
+
+    There is no real need to call this `Click` method, since most web elements
+    returned by all other methods should already expose its own `click` method,
+    but this is made available for more verbose, explicitly calls.
 
     Example:
-        >>> Click((By.NAME, 'commit'))
+
+    >>> Find(
     '''
-    def __init__(self, target):
-        self.target = target
-
-        super(Click, self).__init__()
-
-    def _run(self):
-        wait_until_element_exists(self.browser, self.target).click()
+    element.click()
 
 
-class Fill(Action):
+def Fill(name, value):
     '''Fill a web element (by its name) with a value.
 
     Example:
-        >>> Fill({'some-text-box': 'some value'})
-        >>> Fill({'some-check-box': True})
-        >>> Fill({'some-select-field': 'some-choice'})
 
-    You can also fill out an entire form:
-        >>> Fill({
-                'name': 'John Steinbeck',
-                'writer': True,
-            })
+    >>> Fill({'some-text-box': 'some value'})
+    >>> Fill({'some-check-box': True})
+    >>> Fill({'some-select-field': 'some-choice'})
     '''
-    def __init__(self, field_values):
-        self.field_values = field_values
+    browser = Action.browser
 
-        super(Fill, self).__init__()
-
-    def _run(self):
-        fill_form(self.browser, self.field_values)
+    browser.fill(name, value)
 
 
-class Find(Action):
-    '''Find a web element.
-    '''
+def FillForm(field_values):
+    '''Fill a web form.
 
-    def __init__(self, locator):
-        self.locator = locator
-
-        super(Find, self).__init__()
-
-    def _run(self):
-        self.element = find_element(self.browser, self.locator)
-
-
-class Hover(Action):
-    '''Move and hover the mouse focus to a web element.
+    Fills a web form, filling each field with its corresponding value as
+    provided by the dictionary `field_values`, where its `keys` provide the
+    `name` for a field in the form, and its values are used to populate it.
 
     Example:
-        >>> Hover((By.ID, 'account_name'))
+
+    >>> FillForm({
+    ...    'some-text-box': 'some value',
+    ...    'some-check-box': True,
+    ...    'some-select-field': 'some-choice'})
     '''
-    def __init__(self, target):
-        self.target = target
+    browser = Action.browser
 
-        super(Hover, self).__init__()
-
-    def _run(self):
-        perform_action_chain_move(self.browser, self.target)
+    browser.fill_form(field_values)
 
 
-class Go(Action):
+def Find(finder, locator):
+    '''Find a web element by using a finder type.
+
+    The supported `finder` types are:
+    * 'find_by_css'
+    * 'find_by_xpath'
+    * 'find_by_name'
+    * 'find_by_tag'
+    * 'find_by_value'
+    * 'find_by_text'
+    * 'find_by_id'
+
+    Example:
+
+    >>> Find('find_by_id', '')
+    [<splinter.driver.webdriver.WebDriverElement at 0x1072b9a90>]
+    '''
+    browser = Action.browser
+
+    func = getattr(browser, finder)
+    return func(locator)
+
+
+def Go(URL):
     '''Load URL in the web browser.
 
     Example:
-        >>> Go('https://www.google.com')
+
+    >>> Go('https://www.google.com')
     '''
-    def __init__(self, url):
-        self.url = url
+    browser = Action.browser
 
-        super(Go, self).__init__()
-
-    def _run(self):
-        self.browser.get(self.url)
+    browser.visit(URL)
 
 
-class Select(Action):
-    '''Select a choice from a list of web elements.
-
-    Borrowed from https://github.com/cobrateam/splinter
+def Hover(element):
+    '''Move and hover the mouse focus to a web element.
 
     Example:
-        >>> Select('some-choice-list', 'some-choice-value')
-        >>> Select('some-choice-list', 'some-choice-text', True)
+
+    >>> Hover(element)
     '''
-    def __init__(self, name, value, by_text=False):
-        self.name = name
-        self.value = value
-        self.by_text = by_text
-
-        super(Select, self).__init__()
-
-    def _run(self):
-        select(self.browser, self.name, self.value, self.by_text)
+    element.mouse_over()
 
 
-class SendKeys(Action):
+def Select(name, value, by_text=False):
+    '''Select a choice from a list of web elements.
+
+    Example:
+
+    >>> Select('some-dropdown', 'some-choice-value')
+    >>> Select('some-dropdown','some-choice-text', True)
+    '''
+    browser = Action.browser
+
+    if by_text is True:
+        return browser.select_by_text(name, value)
+    else:
+        return browser.select(name, value)
+
+
+def SendKeys(value, slowly=False):
     '''Send value to a web element that can receive text input.
 
     Example:
-        >>> SendKeys((By.ID, 'lst-ib'), 'WebSmith')
+
+    >>> SendKeys((By.ID, 'lst-ib'), 'WebSmith')
     '''
-    def __init__(self, target, value):
-        self.target = target
-        self.value = value
+    browser = Action.browser
 
-        super(SendKeys, self).__init__()
-
-    def _run(self):
-        element = wait_until_element_exists(self.browser, self.target)
-        element.send_keys(self.value)
+    return browser.type(value, slowly)
 
 
-class Uncheck(Action):
-    '''Mark a checkbox as unchecked.
-
-    Borrowed from https://github.com/cobrateam/splinter
+def Uncheck(name):
+    '''Mark a checkbox as checked.
 
     Example:
-        >>> Uncheck('some-check-box')
+
+    >>> Uncheck('some-check-box')
     '''
+    browser = Action.browser
 
-    def __init__(self, name):
-        self.name = name
-
-        super(Uncheck, self).__init__()
-
-    def _run(self):
-        locator = (By.NAME, self.name)
-        element = wait_until_element_exists(self.browser, locator)
-        element.uncheck()
-
-
-class Wait(Action):
-    '''Wait for a web element to become available.
-
-    Raise a TimeoutException is element is not found.
-
-    Example:
-        >>> Wait((By.ID, 'lst-ib'))
-    '''
-    def __init__(self, target):
-        self.target = target
-
-        super(Wait, self).__init__()
-
-    def _run(self):
-        self.element = wait_until_element_exists(self.browser, self.target)
-
-
-class WaitAndClick(Action):
-    '''Wait for a web element to become available and click it.
-
-    Example:
-        >>> WaitAndClick((By.NAME, 'commit'))
-    '''
-    def __init__(self, target):
-        self.target = target
-
-        super(WaitAndClick, self).__init__()
-
-    def _run(self):
-        wait_until_element_exists(self.browser, self.target).click()
+    return browser.uncheck(name)

@@ -18,7 +18,7 @@ AUTHOR = 'Og Maciel'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'selenium',
+    'splinter',
 ]
 
 here = os.path.abspath(os.path.dirname(__file__))
