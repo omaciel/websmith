@@ -1,7 +1,9 @@
+'''Tests for Radio Buttons and DropDown boxes.'''
 from websmith.actions import (
     Choose,
     FillForm,
-    Find,
+    FindByName,
+    FindByXPATH,
     Go,
     Select,
 )
@@ -20,17 +22,16 @@ def test_fill_form(browser, page):
         Go(page)
         FillForm({'firstname': 'John', 'lastname': 'Steinbeck'})
 
-        assert Find('find_by_name', 'firstname').value == 'John'
-        assert Find('find_by_name', 'lastname').value == 'Steinbeck'
+        assert FindByName('firstname').value == 'John'
+        assert FindByName('lastname').value == 'Steinbeck'
 
 
-def test_select_first_radio_button(browser, page):
+def test_select_radio_button(browser, page):
     '''Select the "John Steinbeck" radio button'''
     with Session(browser):
         Go(page)
         Choose('writers', 'steinbeck')
-        element = Find(
-            'find_by_xpath',
+        element = FindByXPATH(
             ('//input[contains(@type, "radio")'
              'and contains(@value, "steinbeck")]'))
         assert element.checked
@@ -42,8 +43,7 @@ def test_select_from_dropdown_by_value(browser, page):
     with Session(browser):
         Go(page)
         Select('writers', 'bradbury')
-        assert Find(
-            'find_by_xpath',
+        assert FindByXPATH(
             '//option[contains(@value, "bradbury")]').checked
 
 
@@ -52,6 +52,5 @@ def test_select_from_dropdown_by_text(browser, page):
     with Session(browser):
         Go(page)
         Select('writers', 'John Steinbeck', True)
-        assert Find(
-            'find_by_xpath',
+        assert FindByXPATH(
             '//option[contains(@value, "steinbeck")]').checked
