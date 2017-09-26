@@ -10,7 +10,6 @@ LOGGER = logging.getLogger(__name__)
 class Action(object):
     '''Base class for all web actions.'''
     data = threading.local()
-    elements = []
 
     def __init__(self):
         LOGGER.info('ACTION: {} on {}'.format(
@@ -96,27 +95,136 @@ def FillForm(field_values):
     browser.fill_form(field_values)
 
 
-def Find(finder, locator):
-    '''Find a web element by using a finder type.
-
-    The supported `finder` types are:
-    * 'find_by_css'
-    * 'find_by_xpath'
-    * 'find_by_name'
-    * 'find_by_tag'
-    * 'find_by_value'
-    * 'find_by_text'
-    * 'find_by_id'
+def FindByCSS(css):
+    '''Find a web element by using its CSS attribute.
 
     Example:
 
-    >>> Find('find_by_id', '')
-    [<splinter.driver.webdriver.WebDriverElement at 0x1072b9a90>]
+    >>> FindByCSS('h1')
     '''
     browser = Action.browser
 
-    func = getattr(browser, finder)
-    return func(locator)
+    return browser.find_by_css(css)
+
+
+def FindByXPATH(xpath):
+    '''Find a web element by using its XPATH.
+
+    Example:
+
+    >>> FindByXPATH('//input')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_xpath(xpath)
+
+
+def FindByTag(tag):
+    '''Find a web element by using its tag.
+
+    Example:
+
+    >>> FindByTag('input')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_tag(tag)
+
+
+def FindByName(name):
+    '''Find a web element by using its name.
+
+    Example:
+
+    >>> FindByName('name')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_name(name)
+
+
+def FindByText(text):
+    '''Find a web element by using its text attribute.
+
+    Example:
+
+    >>> FindByText('John Steinbeck')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_text(text)
+
+
+def FindByID(ID):
+    '''Find a web element by using its ID.
+
+    Example:
+
+    >>> FindByID('first-column')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_id(ID)
+
+
+def FindByValue(value):
+    '''Find a web element by using its value.
+
+    Example:
+
+    >>> FindByValue('steinbeck')
+    '''
+    browser = Action.browser
+
+    return browser.find_by_value(value)
+
+
+def LinkByHREF(href):
+    '''Find a link by using its HREF value.
+
+    Example:
+
+    >>> LinkByHREF('http://example.com')
+    '''
+    browser = Action.browser
+
+    return browser.find_link_by_href(href)
+
+
+def LinkByPartialHREF(href):
+    '''Find a link by using its partial HREF value.
+
+    Example:
+
+    >>> LinkByPartialHREF('example')
+    '''
+    browser = Action.browser
+
+    return browser.find_link_by_partial_href(href)
+
+
+def LinkByPartialText(text):
+    '''Find a link by using its partial text value.
+
+    Example:
+
+    >>> LinkByPartialText('example')
+    '''
+    browser = Action.browser
+
+    return browser.find_link_by_partial_text(text)
+
+
+def LinkByText(text):
+    '''Find a link by using its text value.
+
+    Example:
+
+    >>> LinkByText('example')
+    '''
+    browser = Action.browser
+
+    return browser.find_link_by_text(text)
 
 
 def Go(URL):
@@ -157,16 +265,16 @@ def Select(name, value, by_text=False):
         return browser.select(name, value)
 
 
-def SendKeys(value, slowly=False):
+def SendKeys(name, value, slowly=False):
     '''Send value to a web element that can receive text input.
 
     Example:
 
-    >>> SendKeys((By.ID, 'lst-ib'), 'WebSmith')
+    >>> SendKeys('q', 'WebSmith')
     '''
     browser = Action.browser
 
-    return browser.type(value, slowly)
+    return browser.type(name, value, slowly)
 
 
 def Uncheck(name):
