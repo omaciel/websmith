@@ -76,7 +76,7 @@ def Fill(name, value):
     browser.fill(name, value)
 
 
-def FillForm(field_values):
+def FillForm(field_values, form_id=None, name=None):
     '''Fill a web form.
 
     Fills a web form, filling each field with its corresponding value as
@@ -92,7 +92,38 @@ def FillForm(field_values):
     '''
     browser = Action.browser
 
-    browser.fill_form(field_values)
+    form = None
+
+    if name is not None:
+        form = browser.find_by_name(name)
+    if form_id is not None:
+        form = browser.find_by_xpath(
+            '//form[contains(@id, "{0}")]'.format(form_id))
+
+    for name, value in field_values.items():
+        if form:
+            elements = form.find_by_name(name)
+        else:
+            elements = browser.find_by_name(name)
+        element = elements.first
+        if (
+                element['type'] in ['text', 'password', 'tel'] or
+                element.tag_name == 'textarea'
+        ):
+            element.value = value
+        elif element['type'] == 'checkbox':
+            if value:
+                element.check()
+            else:
+                element.uncheck()
+        elif element['type'] == 'radio':
+            for field in elements:
+                if field.value == value:
+                    field.click()
+        elif element._element.tag_name == 'select':
+            element.select(value)
+        else:
+            element.value = value
 
 
 def FindByCSS(css):
