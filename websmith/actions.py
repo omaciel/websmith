@@ -97,8 +97,7 @@ def FillForm(field_values, form_id=None, name=None):
     if name is not None:
         form = browser.find_by_name(name)
     if form_id is not None:
-        form = browser.find_by_xpath(
-            '//form[contains(@id, "{0}")]'.format(form_id))
+        form = browser.find_by_id(form_id)
 
     for name, value in field_values.items():
         if form:
