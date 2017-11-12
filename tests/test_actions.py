@@ -34,6 +34,7 @@ def test_select_radio_button(browser, page):
         element = FindByXPATH(
             ('//input[contains(@type, "radio")'
              'and contains(@value, "steinbeck")]'))
+        element.click()
         assert element.checked
         assert element.value == 'steinbeck'
 
