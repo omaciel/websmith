@@ -1,4 +1,4 @@
-"""Foobar."""
+"""Browser and UI Elements."""
 from splinter.driver.webdriver import BaseWebDriver, WebDriverElement
 from splinter.driver.webdriver.cookie_manager import CookieManager
 
